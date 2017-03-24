@@ -19,34 +19,48 @@ SirTrevor.Blocks.FeaturedPages = (function(){
     },
 
 
-    /****** Tufts Customizations ******/
+    /****** Autocomplete Customizations ******/
 
-    sidebarBox: false, // The checkbox for whether sidebar shows or not.
-    limit: 0, // How many feature pages can show?
-    full: false, // Full on feature panels?
+    sidebarEl: false, // The checkbox for whether sidebar shows or not.
+    limit: 5, // How many feature pages can show?
     acInput: false, // The autocomplete input element.
     acShowing: true, // Is the autocomplete showing?
+    warning: "This feature row is at the maximum number of items.",
+    warningEl: false, // The warning's element.
 
     /**
-     * Gets the limit, based on the sidebar.
+     * Builds the warning div, and puts it after the autocomplete.
+     */
+    makeWarningEl: function() {
+      this.warningEl = $("<p>" + this.warning + "</p>");
+      this.acInput.after(this.warningEl);
+    },
+
+    /**
+     * Sets the limit, based on the sidebar.
      */
     setLimit: function() {
-      if(this.sidebarBox === false) {
-        this.sidebarBox = $('#home_page_display_sidebar');
+      if(this.sidebarEl === false) {
+        this.sidebarEl = $('#home_page_display_sidebar');
       }
 
-      this.limit = $(this.sidebarBox).is(':checked') ? 3 : 5;
+      this.limit = $(this.sidebarEl).is(':checked') ? 3 : 5;
     },
 
     /**
      * Hide or show the autocomplete input.
+     *
+     * @param {boolean} full
+     *   Are we full on panels yet?
      */
-    toggleAutocomplete: function() {
-      if(this.full && this.acShowing) {
+    toggleAutocomplete: function(full) {
+      if(full && this.acShowing) {
         this.acInput.hide();
+        this.warningEl.show();
         this.acShowing = false;
-      } else if(!this.full && !this.acShowing) {
+      } else if(!full && !this.acShowing) {
         this.acInput.show();
+        this.warningEl.hide();
         this.acShowing = true;
       }
     },
@@ -62,8 +76,11 @@ SirTrevor.Blocks.FeaturedPages = (function(){
       if(typeof resetLimit !== undefined) {
         this.setLimit();
       }
-      this.full = ($('li.dd-item', this.inner).length >= this.limit);
-      this.toggleAutocomplete();
+
+      // Counts the items in the block and compares to limit.
+      full = ($('li.dd-item', this.inner).length >= this.limit);
+
+      this.toggleAutocomplete(full);
     },
 
     /**
@@ -75,10 +92,11 @@ SirTrevor.Blocks.FeaturedPages = (function(){
       $('[data-input-select-target]', this.inner).selectRelatedInput();
 
       this.acInput = $('span.twitter-typeahead', this.inner);
+      this.makeWarningEl();
       this.resetAc(true);
 
       // If sidebar selection changes, reset autocomplete.
-      $(this.sidebarBox).on("change", function() {
+      this.sidebarEl.on("change", function() {
         this.resetAc(true);
       }.bind(this));
     },
