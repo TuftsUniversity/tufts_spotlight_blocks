@@ -24,7 +24,6 @@ SirTrevor.Blocks.FeaturedPages = (function(){
     sidebarEl: false, // The checkbox for whether sidebar shows or not.
     limit: 5, // How many feature pages can show?
     acInput: false, // The autocomplete input element.
-    acShowing: true, // Is the autocomplete showing?
     warning: "This feature row is at the maximum number of items.",
     warningEl: false, // The warning's element.
 
@@ -54,14 +53,12 @@ SirTrevor.Blocks.FeaturedPages = (function(){
      *   Are we full on panels yet?
      */
     toggleAutocomplete: function(full) {
-      if(full && this.acShowing) {
+      if(full) {
         this.acInput.hide();
         this.warningEl.show();
-        this.acShowing = false;
-      } else if(!full && !this.acShowing) {
+      } else {
         this.acInput.show();
         this.warningEl.hide();
-        this.acShowing = true;
       }
     },
 
